@@ -45,13 +45,6 @@ class FilePipelineStorage(PipelineStorage):
         max_count=-1,
     ) -> Iterator[tuple[str, dict[str, Any]]]:
         """Find files in the storage using a file pattern, as well as a custom filter function."""
-
-        def item_filter(item: dict[str, Any]) -> bool:
-            if file_filter is None:
-                return True
-
-            return all(re.match(value, item[key]) for key, value in file_filter.items())
-
         search_path = Path(self._root_dir) / (base_dir or "")
         #all_files = list(search_path.rglob("**/*"))
         
@@ -61,19 +54,13 @@ class FilePipelineStorage(PipelineStorage):
         num_total = len(all_files)
         num_filtered = 0
         for file in all_files:
-            match = file_pattern.match(f"{file}")
-            group = match.groupdict()
-            print(group)
-            if item_filter(group):
-                filename = file
-                if filename.startswith(os.sep):
-                    filename = filename[1:]
-                yield (filename, group)
-                num_loaded += 1
-                if max_count > 0 and num_loaded >= max_count:
-                    break
-            else:
-                num_filtered += 1
+            filename = file
+            if filename.startswith(os.sep):
+                filename = filename[1:]
+            yield (filename, {})
+            num_loaded += 1
+            if max_count > 0 and num_loaded >= max_count:
+                break
             if progress is not None:
                 progress(_create_progress_status(num_loaded, num_filtered, num_total))
 
