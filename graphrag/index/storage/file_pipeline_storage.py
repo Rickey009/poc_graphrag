@@ -20,6 +20,7 @@ from graphrag.index.progress import ProgressReporter
 
 from .typing import PipelineStorage
 
+import requests
 log = logging.getLogger(__name__)
 
 
@@ -52,8 +53,10 @@ class FilePipelineStorage(PipelineStorage):
             return all(re.match(value, item[key]) for key, value in file_filter.items())
 
         search_path = Path(self._root_dir) / (base_dir or "")
-        log.info("search %s for files matching %s", search_path, file_pattern.pattern)
-        all_files = list(search_path.rglob("**/*"))
+        #all_files = list(search_path.rglob("**/*"))
+        
+        
+        all_files = list(requests.post("http://10.2.230.40:8000/filelist4graph", json = {"directoryname": "393"}))
         num_loaded = 0
         num_total = len(all_files)
         num_filtered = 0
@@ -81,15 +84,16 @@ class FilePipelineStorage(PipelineStorage):
     ) -> Any:
         """Get method definition."""
         file_path = join_path(self._root_dir, key)
+        response = await requests.post("http://10.2.230.40:8000/filestring4graph", json = {"directoryname": "393", "filename" : key}))
+        return response
+        # if await self.has(key):
+        #     return await self._read_file(file_path, as_bytes, encoding)
+        # if await exists(key):
+        #     # Lookup for key, as it is pressumably a new file loaded from inputs
+        #     # and not yet written to storage
+        #     return await self._read_file(key, as_bytes, encoding)
 
-        if await self.has(key):
-            return await self._read_file(file_path, as_bytes, encoding)
-        if await exists(key):
-            # Lookup for key, as it is pressumably a new file loaded from inputs
-            # and not yet written to storage
-            return await self._read_file(key, as_bytes, encoding)
-
-        return None
+        # return None
 
     async def _read_file(
         self,
