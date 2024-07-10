@@ -56,7 +56,7 @@ class FilePipelineStorage(PipelineStorage):
         #all_files = list(search_path.rglob("**/*"))
         
         
-        all_files = list(requests.post("http://10.2.230.40:8000/filelist4graph", json = {"directoryname": "393"}))
+        all_files = list(requests.post("http://10.2.230.41:8000/filelist4graph", json = {"directoryname": "393"}))
         num_loaded = 0
         num_total = len(all_files)
         num_filtered = 0
@@ -84,7 +84,7 @@ class FilePipelineStorage(PipelineStorage):
     ) -> Any:
         """Get method definition."""
         file_path = join_path(self._root_dir, key)
-        response = await requests.post("http://10.2.230.40:8000/filestring4graph", json = {"directoryname": "393", "filename" : key})
+        response = await requests.post("http://10.2.230.41:8000/filestring4graph", json = {"directoryname": "393", "filename" : key})
         return response
         # if await self.has(key):
         #     return await self._read_file(file_path, as_bytes, encoding)
