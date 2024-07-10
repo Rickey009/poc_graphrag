@@ -61,7 +61,9 @@ class FilePipelineStorage(PipelineStorage):
         num_total = len(all_files)
         num_filtered = 0
         for file in all_files:
+            match = file_pattern.match(f"{file}")
             group = match.groupdict()
+            print(group)
             if item_filter(group):
                 filename = file
                 if filename.startswith(os.sep):
