@@ -67,7 +67,10 @@ class FilePipelineStorage(PipelineStorage):
         """Get method definition."""
         file_path = join_path(self._root_dir, key)
         response = requests.post("http://10.2.230.41:8000/filestring4graph", json = {"directoryname": "393", "filename" : key}).json()
-        return response
+        if as_bytes:
+            return response.encode()
+        else:
+            return response
         # if await self.has(key):
         #     return await self._read_file(file_path, as_bytes, encoding)
         # if await exists(key):
