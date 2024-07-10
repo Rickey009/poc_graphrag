@@ -54,10 +54,9 @@ class FilePipelineStorage(PipelineStorage):
         num_total = len(all_files)
         num_filtered = 0
         for file in all_files:
-            filename = file
-            if filename.startswith(os.sep):
-                filename = filename[1:]
-            yield (filename, {})
+            print(file)
+            pirnt(type(file))
+            yield (file, {})
             num_loaded += 1
             if max_count > 0 and num_loaded >= max_count:
                 break
