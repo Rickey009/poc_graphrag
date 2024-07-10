@@ -49,13 +49,11 @@ class FilePipelineStorage(PipelineStorage):
         #all_files = list(search_path.rglob("**/*"))
         
         
-        all_files = list(requests.post("http://10.2.230.41:8000/filelist4graph", json = {"directoryname": "393"}))
+        all_files = requests.post("http://10.2.230.41:8000/filelist4graph", json = {"directoryname": "393"}).json()
         num_loaded = 0
         num_total = len(all_files)
         num_filtered = 0
         for file in all_files:
-            print(file)
-            pirnt(type(file))
             yield (file, {})
             num_loaded += 1
             if max_count > 0 and num_loaded >= max_count:
