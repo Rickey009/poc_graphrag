@@ -61,19 +61,15 @@ class FilePipelineStorage(PipelineStorage):
         num_total = len(all_files)
         num_filtered = 0
         for file in all_files:
-            match = file_pattern.match(f"{file}")
-            if match:
-                group = match.groupdict()
-                if item_filter(group):
-                    filename = f"{file}".replace(self._root_dir, "")
-                    if filename.startswith(os.sep):
-                        filename = filename[1:]
-                    yield (filename, group)
-                    num_loaded += 1
-                    if max_count > 0 and num_loaded >= max_count:
-                        break
-                else:
-                    num_filtered += 1
+            group = match.groupdict()
+            if item_filter(group):
+                filename = file
+                if filename.startswith(os.sep):
+                    filename = filename[1:]
+                yield (filename, group)
+                num_loaded += 1
+                if max_count > 0 and num_loaded >= max_count:
+                    break
             else:
                 num_filtered += 1
             if progress is not None:

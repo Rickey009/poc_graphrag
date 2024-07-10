@@ -44,7 +44,6 @@ async def load(
         storage.find(
             re.compile(config.file_pattern),
             progress=progress,
-            file_filter=config.file_filter,
         )
     )
     if len(files) == 0:
