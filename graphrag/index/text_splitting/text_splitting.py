@@ -14,6 +14,8 @@ from typing import Any, Literal, cast
 import pandas as pd
 import tiktoken
 
+from langchain.text_splitter import MarkdownHeaderTextSplitter
+
 from graphrag.index.utils import num_tokens_from_string
 
 EncodedText = list[int]
@@ -79,6 +81,21 @@ class NoopTextSplitter(TextSplitter):
         """Split text method definition."""
         return [text] if isinstance(text, str) else text
 
+class MarkdownTextSplitter(TextSplitter):
+    def split_text(self, text: str | list[str]) -> list[str]:
+        """Split text method."""
+        if cast(bool, pd.isna(text)) or text == "":
+            return []
+        if isinstance(text, list):
+            text = " ".join(text)
+        if not isinstance(text, str):
+            msg = f"Attempting to split a non-string value, actual is {type(text)}"
+            raise TypeError(msg)
+        headers_to_split_on = [("#", "H1")]
+        markdown_splitter = MarkdownHeaderTextSplitter(headers_to_split_on=headers_to_split_on, strip_headers=False)
+        md_header_splits = markdown_splitter.split_text(text)
+        split_texts = [split_md.page_content for split_md in md_header_splits]
+        return split_texts
 
 class TokenTextSplitter(TextSplitter):
     """Token text splitter class definition."""

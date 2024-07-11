@@ -12,6 +12,7 @@ from graphrag.index.graph.extractors.graph import GraphExtractor
 from graphrag.index.llm import load_llm
 from graphrag.index.text_splitting import (
     NoopTextSplitter,
+    MarkdownTextSplitter,
     TextSplitter,
     TokenTextSplitter,
 )
@@ -133,9 +134,9 @@ def _create_text_splitter(
     """
     if prechunked:
         return NoopTextSplitter()
-
-    return TokenTextSplitter(
-        chunk_size=chunk_size,
-        chunk_overlap=chunk_overlap,
-        encoding_name=encoding_name,
-    )
+    return MarkdownTextSplitter()
+    # return TokenTextSplitter(
+    #     chunk_size=chunk_size,
+    #     chunk_overlap=chunk_overlap,
+    #     encoding_name=encoding_name,
+    # )

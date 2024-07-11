@@ -38,7 +38,7 @@ async def run(
         llm_config,
         chat_only=True,
     )
-    language = args.get("language", "English")
+    language = args.get("language", "Japanese")
     prompt = args.get("prompt")
     chunk_size = args.get("chunk_size", 2500)
     chunk_overlap = args.get("chunk_overlap", 0)
