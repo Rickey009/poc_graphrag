@@ -86,6 +86,8 @@ typing-extensions = "^4.12.2"
 azure-storage-blob = "^12.19.0"
 azure-identity = "^1.17.1"
 
+#Custom
+langchain-text-splitters = "^0.2.2"
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.5.4"
 ipykernel = "^6.29.4"
