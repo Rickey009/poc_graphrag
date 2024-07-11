@@ -85,16 +85,7 @@ typing-extensions = "^4.12.2"
 #Azure
 azure-storage-blob = "^12.19.0"
 azure-identity = "^1.17.1"
-
-#Custom
 langchain-text-splitters = "^0.2.2"
-langchain-core = "^0.2.13"
-packaging = "^24.1"
-langsmith = "^0.1.85"
-jsonpatch = "^1.33"
-orjson = "^3.10.6"
-pydantic-core = "^2.20.1"
-annotated-types = "^0.7.0"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.5.4"
