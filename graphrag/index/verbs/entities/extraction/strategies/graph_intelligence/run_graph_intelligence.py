@@ -134,9 +134,9 @@ def _create_text_splitter(
     """
     if prechunked:
         return NoopTextSplitter()
-    return MarkdownTextSplitter()
-    # return TokenTextSplitter(
-    #     chunk_size=chunk_size,
-    #     chunk_overlap=chunk_overlap,
-    #     encoding_name=encoding_name,
-    # )
+    #return MarkdownTextSplitter()
+    return TokenTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        encoding_name=encoding_name,
+    )
