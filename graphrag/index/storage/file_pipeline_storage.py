@@ -21,6 +21,12 @@ from graphrag.index.progress import ProgressReporter
 from .typing import PipelineStorage
 
 import requests
+
+import platform
+from smb.SMBConnection import SMBConnection
+import docx, openpyxl, pptx, os.path
+import io
+
 log = logging.getLogger(__name__)
 
 
@@ -47,9 +53,26 @@ class FilePipelineStorage(PipelineStorage):
         """Find files in the storage using a file pattern, as well as a custom filter function."""
         search_path = Path(self._root_dir) / (base_dir or "")
         #all_files = list(search_path.rglob("**/*"))
+        #all_files = requests.post("http://10.2.230.41:8000/filelist4graph", json = {"directoryname": "393"}).json()
+        SMBUSER = "rimai"
+        SMBPASS = "Ri_09_2042"
+        RMHOST = "10.2.230.40"
+        RMADDR = "10.2.177.148"
+        RMPORT = 445
         
+        #SMBConnection
+        conn = SMBConnection(
+            SMBUSER,
+            SMBPASS,
+            platform.uname().node,
+            RMHOST,
+            use_ntlm_v2=True,
+            is_direct_tcp=True)
         
-        all_files = requests.post("http://10.2.230.41:8000/filelist4graph", json = {"directoryname": "393"}).json()
+        conn.connect(RMADDR, RMPORT)
+        items = conn.listPath('anthra', '共通フォルダ（全メンバー）/R009/bk', pattern = '*.docx')
+        all_files = [item.filename for item in items]
+        conn.close()
         num_loaded = 0
         num_total = len(all_files)
         num_filtered = 0
@@ -80,8 +103,34 @@ class FilePipelineStorage(PipelineStorage):
         self, key: str, as_bytes: bool | None = False, encoding: str | None = None
     ) -> Any:
         """Get method definition."""
-        file_path = join_path(self._root_dir, key)
-        response = requests.post("http://10.2.230.41:8000/filestring4graph", json = {"directoryname": "393", "filename" : key}).json()
+        #file_path = join_path(self._root_dir, key)
+        response = ""
+        SMBUSER = "rimai"
+        SMBPASS = "Ri_09_2042"
+        RMHOST = "10.2.230.40"
+        RMADDR = "10.2.177.148"
+        RMPORT = 445
+        
+        #SMBConnection
+        conn = SMBConnection(
+            SMBUSER,
+            SMBPASS,
+            platform.uname().node,
+            RMHOST,
+            use_ntlm_v2=True,
+            is_direct_tcp=True)
+        
+        conn.connect(RMADDR, RMPORT)
+        items = conn.listPath('anthra', '共通フォルダ（全メンバー）/R009/bk', pattern = '*.docx')
+        with io.BytesIO() as file:
+            conn.retrieveFile('anthra', f'共通フォルダ（全メンバー）/R009/bk/{key}', file)
+            file.seek(0)
+            document = docx.Document(file)
+            text_list = list(map(lambda par: par.text, document.paragraphs))
+            response = "".join(text_list)
+
+        conn.close()
+        #response = requests.post("http://10.2.230.41:8000/filestring4graph", json = {"directoryname": "393", "filename" : key}).json()
         return response
 
     async def _read_file(

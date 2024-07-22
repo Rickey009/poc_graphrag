@@ -86,6 +86,10 @@ typing-extensions = "^4.12.2"
 azure-storage-blob = "^12.19.0"
 azure-identity = "^1.17.1"
 langchain-text-splitters = "^0.2.2"
+pysmb = "^1.2.9.1"
+python-docx = "^1.1.2"
+openpyxl = "^3.1.5"
+python-pptx = "^0.6.23"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.6.0"
