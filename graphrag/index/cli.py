@@ -68,7 +68,7 @@ def redact(input: dict) -> str:
     return json.dumps(redacted_dict, indent=4)
 
 
-def index_cli(
+async def index_cli(
     root: str,
     init: bool,
     verbose: bool,
@@ -106,7 +106,7 @@ def index_cli(
     pipeline_emit = emit.split(",") if emit else None
     encountered_errors = False
 
-    def _run_workflow_async() -> None:
+    async def _run_workflow_async() -> None:
         import signal
 
         def handle_signal(signum, _):
@@ -169,7 +169,7 @@ def index_cli(
             uvloop.install()
             asyncio.run(execute())
 
-    _run_workflow_async()
+    await _run_workflow_async()
     progress_reporter.stop()
     if encountered_errors:
         progress_reporter.error(
