@@ -185,10 +185,11 @@ def _initialize_project_at(path: str, reporter: ProgressReporter) -> None:
     """Initialize the project at the given path."""
     reporter.info(f"Initializing project at {path}")
     root = Path(path)
+    _cd = Path(path + "/..")
     if not root.exists():
         root.mkdir(parents=True, exist_ok=True)
 
-    settings_yaml = root / "settings.yaml"
+    settings_yaml = _cd / "settings.yaml"
     if settings_yaml.exists():
         msg = f"Project already initialized at {root}"
         raise ValueError(msg)
@@ -265,7 +266,7 @@ def _read_config_parameters(root: str, config: str | None, reporter: ProgressRep
     settings_yaml = (
         Path(config)
         if config and Path(config).suffix in [".yaml", ".yml"]
-        else _root / "settings.yaml"
+        else "settings.yaml"
     )
     if not settings_yaml.exists():
         settings_yaml = _root / "settings.yml"

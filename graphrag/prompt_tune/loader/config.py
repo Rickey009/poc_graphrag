@@ -18,7 +18,8 @@ def read_config_parameters(root: str, reporter: ProgressReporter):
     - reporter: The progress reporter.
     """
     _root = Path(root)
-    settings_yaml = _root / "settings.yaml"
+    _cd = Path(root + "/..")
+    settings_yaml = _cd / "settings.yaml"
     if not settings_yaml.exists():
         settings_yaml = _root / "settings.yml"
     settings_json = _root / "settings.json"
