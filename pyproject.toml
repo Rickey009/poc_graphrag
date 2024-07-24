@@ -90,6 +90,8 @@ pysmb = "^1.2.9.1"
 python-docx = "^1.1.2"
 openpyxl = "^3.1.5"
 python-pptx = "^0.6.23"
+chardet = "^5.2.0"
+pdfminer-six = "^20240706"
 
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.6.0"

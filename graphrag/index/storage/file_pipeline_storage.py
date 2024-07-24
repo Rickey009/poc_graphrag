@@ -42,6 +42,77 @@ class FilePipelineStorage(PipelineStorage):
         self._encoding = encoding or "utf-8"
         Path(self._root_dir).mkdir(parents=True, exist_ok=True)
 
+    ####text html md csvファイル（拡張子：.txt .html .md .csv)からテキスト抽出するメソッド
+    def get_text_from_binary(file: io.BytesIO) -> str:
+        # ファイルオブジェクトの内容をバイナリモードで読み込む
+        raw_data = file.read()
+        # chardetを使用して文字コードを検出
+        encoding = chardet.detect(raw_data)['encoding']
+        # ファイルオブジェクトのポインタを先頭に戻す
+        file.seek(0)
+        # 検出した文字コードでファイルオブジェクトを読み込み、全内容を一つの文字列として取得する
+        content = file.read().decode(encoding)
+        return content
+    
+    ####PDFファイル（拡張子：.pdf)からテキスト抽出するメソッド
+    def get_text_from_pdf(file: io.BytesIO) -> str:
+        output = io.StringIO()
+        extract_text_to_fp(file, output)
+        return output.getvalue()
+    
+    ####PowerPointファイル（拡張子：.pptx)からテキスト抽出するメソッド
+    def get_text_from_powerpoint(file: io.BytesIO) -> str:
+        prs = pptx.Presentation(file)
+        output = ""
+        for i, sld in enumerate(prs.slides, start=1):
+            for shp in sld.shapes:
+                if shp.has_text_frame:
+                    text = shp.text
+                    output += text.replace("\n", "").replace("\n", "").replace(" ", "").replace("　", "")
+        return output
+    
+    
+    ####Wordファイル（拡張子：docx)からテキスト抽出するメソッド
+    def get_text_from_word(file: io.BytesIO) -> str:
+        document = docx.Document(file)
+        text_list = list(map(lambda par: par.text, document.paragraphs))
+        text = "".join(text_list)
+        output = text.replace(" ", "").replace("　", "")
+        return output
+    
+    ####Excelファイル（拡張子：.xlsx)からテキスト抽出するメソッド
+    def get_text_from_excel(file: io.BytesIO) -> str:
+        output_text = ""
+        book = openpyxl.load_workbook(file)
+        sheet_list = book.sheetnames
+        for sheet_name in sheet_list:
+            sheet = book[sheet_name]
+            output_text += f"{sheet_name}\n"
+            for cells in tuple(sheet.rows):
+                for cell in cells:
+                    data = cell.value
+                    if data is None:
+                        continue
+                    else:
+                        #output_text += str(data).replace(" ", "").replace("　", "")
+                        output_text += str(data)
+                output_text += "\n"
+            output_text += "\n\n"
+        return output_text
+
+    ####Key: ファイルの拡張子に応じて、Value: 適切なメソッドを選択する際に用いる辞書
+    func_dict = {
+        'pdf' : get_text_from_pdf,
+        'docx'  : get_text_from_word,
+        'xlsx'  : get_text_from_excel,
+        'xlsm'  : get_text_from_excel,
+        'pptx' : get_text_from_powerpoint,
+        'txt' : get_text_from_binary,
+        'html' : get_text_from_binary,
+        'md' : get_text_from_binary,
+        'csv' : get_text_from_binary
+             }
+
     def find(
         self,
         file_pattern: re.Pattern[str],
@@ -75,7 +146,7 @@ class FilePipelineStorage(PipelineStorage):
             is_direct_tcp=True)
         
         conn.connect(RMADDR, RMPORT)
-        items = conn.listPath(share_directory, file_path, pattern = '*.docx')
+        items = conn.listPath(share_directory, file_path, pattern = '*.docx|*.pdf|*.xlsx|*.xlsm|*.pptx|*.txt|*.html|*.md|*.csv')
         all_files = [item.filename for item in items]
         conn.close()
         num_loaded = 0
@@ -126,14 +197,15 @@ class FilePipelineStorage(PipelineStorage):
             is_direct_tcp=True)
         
         conn.connect(RMADDR, RMPORT)
-        items = conn.listPath(share_directory, file_path, pattern = '*.docx')
+#        items = conn.listPath(share_directory, file_path, pattern = '*.docx|*.pdf|*.txt')
+        _, ext = os.path.splitext(key)
+        ext = ext[1:].lower()
         with io.BytesIO() as file:
             conn.retrieveFile('anthra', f'{file_path}/{key}', file)
             file.seek(0)
-            document = docx.Document(file)
-            text_list = list(map(lambda par: par.text, document.paragraphs))
-            response = "".join(text_list)
-
+            if ext in func_dict:
+                func = func_dict[ext]
+                response = func(file)
         conn.close()
         #response = requests.post("http://10.2.230.41:8000/filestring4graph", json = {"directoryname": "393", "filename" : key}).json()
         return response
