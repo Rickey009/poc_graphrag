@@ -213,7 +213,7 @@ class FilePipelineStorage(PipelineStorage):
 
         with io.BytesIO() as file:
             conn.retrieveFile('anthra', f'{file_path}/{key}', file)
-#            file.seek(0)
+            file.seek(0)
             if ext in func_dict:
                 print(f"{ext}処理には入っている")
                 func = func_dict[ext]
