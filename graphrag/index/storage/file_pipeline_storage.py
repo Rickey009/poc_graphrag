@@ -45,13 +45,15 @@ class FilePipelineStorage(PipelineStorage):
     ####text html md csvファイル（拡張子：.txt .html .md .csv)からテキスト抽出するメソッド
     def get_text_from_binary(file: io.BytesIO) -> str:
         # ファイルオブジェクトの内容をバイナリモードで読み込む
-        raw_data = file.read()
+#        raw_data = file.read()
         # chardetを使用して文字コードを検出
-        encoding = chardet.detect(raw_data)['encoding']
+#        encoding = chardet.detect(raw_data)['encoding']
         # ファイルオブジェクトのポインタを先頭に戻す
         file.seek(0)
         # 検出した文字コードでファイルオブジェクトを読み込み、全内容を一つの文字列として取得する
-        content = file.read().decode(encoding)
+#        content = file.read().decode(encoding)
+        
+        content = file.read().decode()
         return content
     
     ####PDFファイル（拡張子：.pdf)からテキスト抽出するメソッド
@@ -146,7 +148,7 @@ class FilePipelineStorage(PipelineStorage):
             is_direct_tcp=True)
         
         conn.connect(RMADDR, RMPORT)
-        items = conn.listPath(share_directory, file_path, pattern = '*.docx|*.pdf|*.xlsx|*.xlsm|*.pptx|*.txt|*.html|*.md|*.csv')
+        items = conn.listPath(share_directory, file_path, pattern = '*.docx|*.pdf|*.xlsx|*.xlsm|*.pptx|*.txt|*.html|*.md|*.csv', timeout = 30)
         all_files = [item.filename for item in items]
         conn.close()
         num_loaded = 0
