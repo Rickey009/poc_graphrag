@@ -78,7 +78,7 @@ class LocalSearch(BaseSearch):
                 {"role": "system", "content": search_prompt},
                 {"role": "user", "content": query},
             ]
-            print(search_prompt)
+            print(query)
             response = await self.llm.agenerate(
                 messages=search_messages,
                 streaming=True,
@@ -130,7 +130,7 @@ class LocalSearch(BaseSearch):
                 {"role": "system", "content": search_prompt},
                 {"role": "user", "content": query},
             ]
-            print(search_prompt)
+            print(query)
             response = self.llm.generate(
                 messages=search_messages,
                 streaming=True,

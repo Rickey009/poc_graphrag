@@ -320,7 +320,7 @@ class GlobalSearch(BaseSearch):
                 {"role": "system", "content": search_prompt},
                 {"role": "user", "content": query},
             ]
-            print(search_prompt)
+            print(query)
             search_response = await self.llm.agenerate(
                 search_messages,
                 streaming=True,
