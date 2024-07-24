@@ -215,12 +215,9 @@ class FilePipelineStorage(PipelineStorage):
             conn.retrieveFile('anthra', f'{file_path}/{key}', file)
             file.seek(0)
             if ext in func_dict:
-                print(f"{ext}処理には入っている")
                 func = func_dict[ext]
                 response = func(file)
         conn.close()
-        #response = requests.post("http://10.2.230.41:8000/filestring4graph", json = {"directoryname": "393", "filename" : key}).json()
-        print(f"テキスト:{response}")
         return response
 
     async def _read_file(
