@@ -93,7 +93,7 @@ def index_cli(
     progress_reporter = _get_progress_reporter(reporter)
     if init:
         _initialize_project_at(root, progress_reporter)
-        sys.exit(0)
+#        sys.exit(0)
     if overlay_defaults:
         pipeline_config: str | PipelineConfig = _create_default_config(
             root, config, verbose, dryrun or False, progress_reporter
@@ -178,7 +178,7 @@ def index_cli(
         progress_reporter.success("All workflows completed successfully.")
 
     if cli:
-        sys.exit(1 if encountered_errors else 0)
+#        sys.exit(1 if encountered_errors else 0)
 
 
 def _initialize_project_at(path: str, reporter: ProgressReporter) -> None:
@@ -257,7 +257,7 @@ def _create_default_config(
 
     if dryrun:
         reporter.info("dry run complete, exiting...")
-        sys.exit(0)
+#        sys.exit(0)
     return result
 
 
