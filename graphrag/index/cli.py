@@ -190,17 +190,17 @@ def _initialize_project_at(path: str, reporter: ProgressReporter) -> None:
         root.mkdir(parents=True, exist_ok=True)
 
     settings_yaml = _cd / "settings.yaml"
-    if settings_yaml.exists():
-        msg = f"Project already initialized at {root}"
-        raise ValueError(msg)
+    # if settings_yaml.exists():
+    #     msg = f"Project already initialized at {root}"
+    #     raise ValueError(msg)
 
     dotenv = root / ".env"
-    if not dotenv.exists():
-        with settings_yaml.open("w") as file:
-            file.write(INIT_YAML)
+    # if not dotenv.exists():
+    #     with settings_yaml.open("w") as file:
+    #         file.write(INIT_YAML)
 
-    with dotenv.open("w") as file:
-        file.write(INIT_DOTENV)
+    # with dotenv.open("w") as file:
+    #     file.write(INIT_DOTENV)
 
     prompts_dir = root / "prompts"
     if not prompts_dir.exists():
