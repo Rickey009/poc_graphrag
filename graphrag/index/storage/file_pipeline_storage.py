@@ -148,7 +148,16 @@ class FilePipelineStorage(PipelineStorage):
             is_direct_tcp=True)
         
         conn.connect(RMADDR, RMPORT)
-        items = conn.listPath(share_directory, file_path, pattern = '*.docx|*.pdf|*.xlsx|*.xlsm|*.pptx|*.txt|*.html|*.md|*.csv', timeout = 30)
+        # 検索するファイルパターン
+        patterns = ['*.docx', '*.pdf', '*.xlsx', '*.xlsm', '*.pptx', '*.txt', '*.html', '*.md', '*.csv']
+        items = []
+        
+        try:
+            for pattern in patterns:
+                files = conn.listPath(share_directory, file_path, pattern=pattern)
+                items.extend(files)
+        except Exception as e:
+            print(f"Error: {e}")
         all_files = [item.filename for item in items]
         conn.close()
         num_loaded = 0
