@@ -163,6 +163,51 @@ class GlobalSearch(BaseSearch):
         """Perform a global search synchronously."""
         return asyncio.run(self.asearch(query, conversation_history))
 
+    async def aget_prompt(
+        self,
+        query: str,
+        conversation_history: ConversationHistory | None = None,
+        **kwargs: Any,
+    ) -> str:
+        # Step 1: Generate answers for each batch of community short summaries
+        start_time = time.time()
+        context_chunks, context_records = self.context_builder.build_context(
+            conversation_history=conversation_history, **self.context_builder_params
+        )
+
+        if self.callbacks:
+            for callback in self.callbacks:
+                callback.on_map_response_start(context_chunks)  # type: ignore
+        map_responses = await asyncio.gather(*[
+            self._map_response_single_batch(
+                context_data=data, query=query, **self.map_llm_params
+            )
+            for data in context_chunks
+        ])
+        if self.callbacks:
+            for callback in self.callbacks:
+                callback.on_map_response_end(map_responses)
+        map_llm_calls = sum(response.llm_calls for response in map_responses)
+        map_prompt_tokens = sum(response.prompt_tokens for response in map_responses)
+
+        # Step 2: Combine the intermediate answers from step 2 to generate the final answer
+        reduce_response = await self._get_system_prompt(
+            map_responses=map_responses,
+            query=query,
+            **self.reduce_llm_params,
+        )
+
+        return reduce_response
+
+    def get_prompt(
+        self,
+        query: str,
+        conversation_history: ConversationHistory | None = None,
+        **kwargs: Any,
+    ) -> str:
+        """Perform a global search synchronously."""
+        return asyncio.run(self.aget_prompt(query, conversation_history))
+
     async def _map_response_single_batch(
         self,
         context_data: str,
@@ -320,7 +365,7 @@ class GlobalSearch(BaseSearch):
                 {"role": "system", "content": search_prompt},
                 {"role": "user", "content": query},
             ]
-            print(query)
+
             search_response = await self.llm.agenerate(
                 search_messages,
                 streaming=True,
@@ -335,6 +380,95 @@ class GlobalSearch(BaseSearch):
                 llm_calls=1,
                 prompt_tokens=num_tokens(search_prompt, self.token_encoder),
             )
+        except Exception:
+            log.exception("Exception in reduce_response")
+            return SearchResult(
+                response="",
+                context_data=text_data,
+                context_text=text_data,
+                completion_time=time.time() - start_time,
+                llm_calls=1,
+                prompt_tokens=num_tokens(search_prompt, self.token_encoder),
+            )
+    async def _get_system_prompt(
+        self,
+        map_responses: list[SearchResult],
+        query: str,
+        **llm_kwargs,
+    ) -> str:
+        """Combine all intermediate responses from single batches into a final answer to the user query."""
+        text_data = ""
+        search_prompt = ""
+        start_time = time.time()
+        try:
+            # collect all key points into a single list to prepare for sorting
+            key_points = []
+            for index, response in enumerate(map_responses):
+                if not isinstance(response.response, list):
+                    continue
+                for element in response.response:
+                    if not isinstance(element, dict):
+                        continue
+                    if "answer" not in element or "score" not in element:
+                        continue
+                    key_points.append({
+                        "analyst": index,
+                        "answer": element["answer"],
+                        "score": element["score"],
+                    })
+
+            # filter response with score = 0 and rank responses by descending order of score
+            filtered_key_points = [
+                point
+                for point in key_points
+                if point["score"] > 0  # type: ignore
+            ]
+
+            if len(filtered_key_points) == 0 and not self.allow_general_knowledge:
+                # return no data answer if no key points are found
+                return SearchResult(
+                    response=NO_DATA_ANSWER,
+                    context_data="",
+                    context_text="",
+                    completion_time=time.time() - start_time,
+                    llm_calls=0,
+                    prompt_tokens=0,
+                )
+
+            filtered_key_points = sorted(
+                filtered_key_points,
+                key=lambda x: x["score"],  # type: ignore
+                reverse=True,  # type: ignore
+            )
+
+            data = []
+            total_tokens = 0
+            for point in filtered_key_points:
+                formatted_response_data = []
+                formatted_response_data.append(
+                    f'----Analyst {point["analyst"] + 1}----'
+                )
+                formatted_response_data.append(
+                    f'Importance Score: {point["score"]}'  # type: ignore
+                )
+                formatted_response_data.append(point["answer"])  # type: ignore
+                formatted_response_text = "\n".join(formatted_response_data)
+                if (
+                    total_tokens
+                    + num_tokens(formatted_response_text, self.token_encoder)
+                    > self.max_data_tokens
+                ):
+                    break
+                data.append(formatted_response_text)
+                total_tokens += num_tokens(formatted_response_text, self.token_encoder)
+            text_data = "\n\n".join(data)
+
+            search_prompt = self.reduce_system_prompt.format(
+                report_data=text_data, response_type=self.response_type
+            )
+            if self.allow_general_knowledge:
+                search_prompt += "\n" + self.general_knowledge_inclusion_prompt
+            return search_prompt
         except Exception:
             log.exception("Exception in reduce_response")
             return SearchResult(

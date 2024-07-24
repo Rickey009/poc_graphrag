@@ -157,3 +157,69 @@ class LocalSearch(BaseSearch):
                 llm_calls=1,
                 prompt_tokens=num_tokens(search_prompt, self.token_encoder),
             )
+
+    async def aget_prompt(
+        self,
+        query: str,
+        conversation_history: ConversationHistory | None = None,
+        **kwargs,
+    ) -> str:
+        """Build local search context that fits a single context window and generate answer for the user query."""
+        start_time = time.time()
+        search_prompt = ""
+
+        context_text, context_records = self.context_builder.build_context(
+            query=query,
+            conversation_history=conversation_history,
+            **kwargs,
+            **self.context_builder_params,
+        )
+        log.info("GENERATE ANSWER: %s. QUERY: %s", start_time, query)
+        try:
+            search_prompt = self.system_prompt.format(
+                context_data=context_text, response_type=self.response_type
+            )
+            return search_prompt
+        except Exception:
+            log.exception("Exception in _asearch")
+            return SearchResult(
+                response="",
+                context_data=context_records,
+                context_text=context_text,
+                completion_time=time.time() - start_time,
+                llm_calls=1,
+                prompt_tokens=num_tokens(search_prompt, self.token_encoder),
+            )
+
+    def get_prompt(
+        self,
+        query: str,
+        conversation_history: ConversationHistory | None = None,
+        **kwargs,
+    ) -> str:
+        """Build local search context that fits a single context window and generate answer for the user question."""
+        start_time = time.time()
+        search_prompt = ""
+        context_text, context_records = self.context_builder.build_context(
+            query=query,
+            conversation_history=conversation_history,
+            **kwargs,
+            **self.context_builder_params,
+        )
+        log.info("GENERATE ANSWER: %d. QUERY: %s", start_time, query)
+        try:
+            search_prompt = self.system_prompt.format(
+                context_data=context_text, response_type=self.response_type
+            )
+            return search_prompt
+
+        except Exception:
+            log.exception("Exception in _map_response_single_batch")
+            return SearchResult(
+                response="",
+                context_data=context_records,
+                context_text=context_text,
+                completion_time=time.time() - start_time,
+                llm_calls=1,
+                prompt_tokens=num_tokens(search_prompt, self.token_encoder),
+            )

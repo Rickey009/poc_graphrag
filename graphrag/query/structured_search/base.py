@@ -67,3 +67,21 @@ class BaseSearch(ABC):
         **kwargs,
     ) -> SearchResult:
         """Search for the given query asynchronously."""
+
+    @abstractmethod
+    def get_prompt(
+        self,
+        query: str,
+        conversation_history: ConversationHistory | None = None,
+        **kwargs,
+    ) -> str:
+        """Search for the given query."""
+
+    @abstractmethod
+    async def aget_prompt(
+        self,
+        query: str,
+        conversation_history: ConversationHistory | None = None,
+        **kwargs,
+    ) -> str:
+        """Search for the given query asynchronously."""
