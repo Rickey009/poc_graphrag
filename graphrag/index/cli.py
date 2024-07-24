@@ -158,10 +158,11 @@ def index_cli(
             loop = asyncio.get_event_loop()
             loop.run_until_complete(execute())
         elif sys.version_info >= (3, 11):
-            import uvloop  # type: ignore Ignoring because on windows this will cause an error
+            # import uvloop  # type: ignore Ignoring because on windows this will cause an error
 
-            with asyncio.Runner(loop_factory=uvloop.new_event_loop) as runner:  # type: ignore Ignoring because minor versions this will throw an error
-                runner.run(execute())
+            # with asyncio.Runner(loop_factory=uvloop.new_event_loop) as runner:  # type: ignore Ignoring because minor versions this will throw an error
+            #     runner.run(execute())
+            await execute()
         else:
             import uvloop  # type: ignore Ignoring because on windows this will cause an error
 
