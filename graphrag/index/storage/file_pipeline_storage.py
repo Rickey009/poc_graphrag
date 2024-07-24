@@ -217,6 +217,7 @@ class FilePipelineStorage(PipelineStorage):
             if ext in func_dict:
                 func = func_dict[ext]
                 response = func(file)
+                print(response)
         conn.close()
         #response = requests.post("http://10.2.230.41:8000/filestring4graph", json = {"directoryname": "393", "filename" : key}).json()
         return response
