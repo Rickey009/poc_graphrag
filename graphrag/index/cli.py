@@ -263,13 +263,14 @@ def _create_default_config(
 
 def _read_config_parameters(root: str, config: str | None, reporter: ProgressReporter):
     _root = Path(root)
+    _cd = Path(root + "/..")
     settings_yaml = (
         Path(config)
         if config and Path(config).suffix in [".yaml", ".yml"]
         else "settings.yaml"
     )
     if not settings_yaml.exists():
-        settings_yaml = _root / "settings.yml"
+        settings_yaml = _cd / "settings.yaml"
     settings_json = (
         Path(config)
         if config and Path(config).suffix == ".json"
