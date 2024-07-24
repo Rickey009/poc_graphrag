@@ -177,7 +177,7 @@ def index_cli(
     else:
         progress_reporter.success("All workflows completed successfully.")
 
-    if cli:
+#    if cli:
 #        sys.exit(1 if encountered_errors else 0)
 
 
