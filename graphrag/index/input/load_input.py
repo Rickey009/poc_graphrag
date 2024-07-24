@@ -34,6 +34,11 @@ async def load_input(
     config: PipelineInputConfig | InputConfig,
     progress_reporter: ProgressReporter | None = None,
     root_dir: str | None = None,
+    userid: str  | None = None,
+    password: str  | None = None,
+    share_directory: str  | None = None,
+    file_server: str  | None = None,
+    file_path: str  | None = None,
 ) -> pd.DataFrame:
     """Load the input data for a pipeline."""
     root_dir = root_dir or ""
@@ -78,7 +83,7 @@ async def load_input(
             f"Loading Input ({config.file_type})", transient=False
         )
         loader = loaders[config.file_type]
-        results = await loader(config, progress, storage)
+        results = await loader(config, progress, storage, userid, password, share_directory, file_server, file_path)
         return cast(pd.DataFrame, results)
 
     msg = f"Unknown input type {config.file_type}"

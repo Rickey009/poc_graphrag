@@ -82,6 +82,11 @@ async def run_pipeline_with_config(
     memory_profile: bool = False,
     run_id: str | None = None,
     is_resume_run: bool = False,
+    userid: str  | None = None,
+    password: str  | None = None,
+    share_directory: str  | None = None,
+    file_server: str  | None = None,
+    file_path: str  | None = None,
     **_kwargs: dict,
 ) -> AsyncIterable[PipelineRunResult]:
     """Run a pipeline with the given config.
@@ -130,7 +135,7 @@ async def run_pipeline_with_config(
         if config is None:
             return None
 
-        return await load_input(config, progress_reporter, root_dir)
+        return await load_input(config, progress_reporter, root_dir, userid, password, share_directory, file_server, file_path)
 
     def _create_postprocess_steps(
         config: PipelineInputConfigTypes | None,

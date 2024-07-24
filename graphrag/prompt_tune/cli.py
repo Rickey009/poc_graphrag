@@ -42,6 +42,11 @@ async def fine_tune(
     language: str | None = None,
     skip_entity_types: bool = False,
     output: str = "prompts",
+    userid: str  | None = None,
+    password: str  | None = None,
+    share_directory: str  | None = None,
+    file_server: str  | None = None,
+    file_path: str  | None = None,
 ):
     """Fine tune the model.
 
@@ -71,6 +76,11 @@ async def fine_tune(
         skip_entity_types,
         output,
         reporter,
+        userid,
+        password,
+        share_directory,
+        file_server,
+        file_path,
     )
 
 
@@ -86,6 +96,11 @@ async def fine_tune_with_config(
     skip_entity_types: bool = False,
     output: str = "prompts",
     reporter: ProgressReporter | None = None,
+    userid: str  | None = None,
+    password: str  | None = None,
+    share_directory: str  | None = None,
+    file_server: str  | None = None,
+    file_path: str  | None = None,
 ):
     """Fine tune the model with a configuration.
 
@@ -118,6 +133,11 @@ async def fine_tune_with_config(
         select_method=select,
         reporter=reporter,
         chunk_size=chunk_size,
+        userid=userid,
+        password=password,
+        share_directory=share_directory,
+        file_server=file_server,
+        file_path=file_path,
     )
 
     # Create LLM from config

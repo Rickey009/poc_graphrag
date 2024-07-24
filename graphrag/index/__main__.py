@@ -1,8 +1,3 @@
-# Copyright (c) 2024 Microsoft Corporation.
-# Licensed under the MIT License
-
-"""The Indexing Engine package root."""
-
 import argparse
 from .cli import index_cli
 
@@ -65,6 +60,41 @@ def main(args=None):
         help="Overlay default configuration values on a provided configuration file (--config).",
         action="store_true",
     )
+    parser.add_argument(
+        "--userid",
+        help="Specify the file path to be used.",
+        required=False,
+        type=str,
+        default='',
+    )
+    parser.add_argument(
+        "--password",
+        help="Specify the file path to be used.",
+        required=False,
+        type=str,
+        default='',
+    )
+    parser.add_argument(
+        "--sharedirectory",
+        help="Specify the file path to be used.",
+        required=False,
+        type=str,
+        default='',
+    )
+    parser.add_argument(
+        "--fileserver",
+        help="Specify the file path to be used.",
+        required=False,
+        type=str,
+        default='',
+    )
+    parser.add_argument(
+        "--filepath",
+        help="Specify the file path to be used.",
+        required=False,
+        type=str,
+        default='',
+    )
     args = parser.parse_args(args)
 
     if args.overlay_defaults and not args.config:
@@ -83,6 +113,11 @@ def main(args=None):
         init=args.init or False,
         overlay_defaults=args.overlay_defaults or False,
         cli=True,
+        userid=args.userid,
+        password=args.password,
+        share_directory=args.sharedirectory,
+        file_server=args.fileserver,
+        file_path=args.filepath
     )
 
 if __name__ == "__main__":

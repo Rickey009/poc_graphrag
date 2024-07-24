@@ -24,9 +24,14 @@ async def load_docs_in_chunks(
     limit: int,
     reporter: ProgressReporter,
     chunk_size: int = MIN_CHUNK_SIZE,
+    userid: str  | None = None,
+    password: str  | None = None,
+    share_directory: str  | None = None,
+    file_server: str  | None = None,
+    file_path: str  | None = None,
 ) -> list[str]:
     """Load docs into chunks for generating prompts."""
-    dataset = await load_input(config.input, reporter, root)
+    dataset = await load_input(config.input, reporter, root, userid, password, share_directory, file_server, file_path)
 
     # covert to text units
     input = VerbInput(input=TableContainer(table=dataset))

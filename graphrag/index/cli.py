@@ -81,6 +81,11 @@ def index_cli(
     dryrun: bool,
     overlay_defaults: bool,
     cli: bool = False,
+    userid: str  | None = None,
+    password: str  | None = None,
+    share_directory: str  | None = None,
+    file_server: str  | None = None,
+    file_path: str  | None = None,
 ):
     """Run the pipeline with the given config."""
     run_id = resume or time.strftime("%Y%m%d-%H%M%S")
@@ -132,6 +137,11 @@ def index_cli(
                     else None
                 ),
                 is_resume_run=bool(resume),
+                userid=userid,
+                password=password,
+                share_directory=share_directory,
+                file_server=file_server,
+                file_path=file_path,
             ):
                 if output.errors and len(output.errors) > 0:
                     encountered_errors = True

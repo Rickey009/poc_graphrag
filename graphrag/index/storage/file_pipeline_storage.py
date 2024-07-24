@@ -49,15 +49,20 @@ class FilePipelineStorage(PipelineStorage):
         progress: ProgressReporter | None = None,
         file_filter: dict[str, Any] | None = None,
         max_count=-1,
+        userid: str  | None = None,
+        password: str  | None = None,
+        share_directory: str  | None = None,
+        file_server: str  | None = None,
+        file_path: str  | None = None,
     ) -> Iterator[tuple[str, dict[str, Any]]]:
         """Find files in the storage using a file pattern, as well as a custom filter function."""
         search_path = Path(self._root_dir) / (base_dir or "")
         #all_files = list(search_path.rglob("**/*"))
         #all_files = requests.post("http://10.2.230.41:8000/filelist4graph", json = {"directoryname": "393"}).json()
-        SMBUSER = "rimai"
-        SMBPASS = "Ri_09_2042"
+        SMBUSER = userid
+        SMBPASS = password
         RMHOST = "10.2.230.40"
-        RMADDR = "10.2.177.148"
+        RMADDR = file_server
         RMPORT = 445
         
         #SMBConnection
@@ -70,7 +75,7 @@ class FilePipelineStorage(PipelineStorage):
             is_direct_tcp=True)
         
         conn.connect(RMADDR, RMPORT)
-        items = conn.listPath('anthra', '共通フォルダ（全メンバー）/R009/bk', pattern = '*.docx')
+        items = conn.listPath(share_directory, file_path, pattern = '*.docx')
         all_files = [item.filename for item in items]
         conn.close()
         num_loaded = 0
@@ -100,15 +105,15 @@ class FilePipelineStorage(PipelineStorage):
         return None
 
     async def getText(
-        self, key: str, as_bytes: bool | None = False, encoding: str | None = None
+        self, key: str, as_bytes: bool | None = False, encoding: str | None = None, userid: str | None = None, password: str | None = None, share_directory: str | None = None, file_server: str | None = None, file_path: str | None = None
     ) -> Any:
         """Get method definition."""
         #file_path = join_path(self._root_dir, key)
         response = ""
-        SMBUSER = "rimai"
-        SMBPASS = "Ri_09_2042"
+        SMBUSER = userid
+        SMBPASS = password
         RMHOST = "10.2.230.40"
-        RMADDR = "10.2.177.148"
+        RMADDR = file_server
         RMPORT = 445
         
         #SMBConnection
@@ -121,9 +126,9 @@ class FilePipelineStorage(PipelineStorage):
             is_direct_tcp=True)
         
         conn.connect(RMADDR, RMPORT)
-        items = conn.listPath('anthra', '共通フォルダ（全メンバー）/R009/bk', pattern = '*.docx')
+        items = conn.listPath(share_directory, file_path, pattern = '*.docx')
         with io.BytesIO() as file:
-            conn.retrieveFile('anthra', f'共通フォルダ（全メンバー）/R009/bk/{key}', file)
+            conn.retrieveFile('anthra', f'{file_path}/{key}', file)
             file.seek(0)
             document = docx.Document(file)
             text_list = list(map(lambda par: par.text, document.paragraphs))

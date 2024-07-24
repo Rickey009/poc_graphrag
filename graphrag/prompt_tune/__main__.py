@@ -100,7 +100,41 @@ if __name__ == "__main__":
         required=False,
         default="prompts",
     )
-
+    parser.add_argument(
+        "--userid",
+        help="Specify the file path to be used.",
+        required=False,
+        type=str,
+        default='',
+    )
+    parser.add_argument(
+        "--password",
+        help="Specify the file path to be used.",
+        required=False,
+        type=str,
+        default='',
+    )
+    parser.add_argument(
+        "--sharedirectory",
+        help="Specify the file path to be used.",
+        required=False,
+        type=str,
+        default='',
+    )
+    parser.add_argument(
+        "--fileserver",
+        help="Specify the file path to be used.",
+        required=False,
+        type=str,
+        default='',
+    )
+    parser.add_argument(
+        "--filepath",
+        help="Specify the file path to be used.",
+        required=False,
+        type=str,
+        default='',
+    )
     args = parser.parse_args()
 
     loop = asyncio.get_event_loop()
@@ -116,5 +150,10 @@ if __name__ == "__main__":
             args.language,
             args.no_entity_types,
             args.output,
+            args.userid,
+            args.password,
+            args.sharedirectory,
+            args.fileserver,
+            args.filepath
         )
     )

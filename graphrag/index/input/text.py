@@ -26,6 +26,11 @@ async def load(
     config: PipelineInputConfig,
     progress: ProgressReporter | None,
     storage: PipelineStorage,
+    userid: str  | None = None,
+    password: str  | None = None,
+    share_directory: str  | None = None,
+    file_server: str  | None = None,
+    file_path: str  | None = None,
 ) -> pd.DataFrame:
     """Load text inputs from a directory."""
 
@@ -34,7 +39,7 @@ async def load(
     ) -> dict[str, Any]:
         if group is None:
             group = {}
-        text = await storage.getText(path, encoding="utf-8")
+        text = await storage.getText(path, encoding="utf-8", userid=userid, password=password, share_directory=share_directory, file_server=file_server, file_path=file_path)
         new_item = {**group, "text": text}
         new_item["id"] = gen_md5_hash(new_item, new_item.keys())
         new_item["title"] = str(Path(path).name)
@@ -44,6 +49,11 @@ async def load(
         storage.find(
             re.compile(config.file_pattern),
             progress=progress,
+            userid=userid,
+            password=password,
+            share_directory=share_directory,
+            file_server=file_server,
+            file_path=file_path,
         )
     )
     if len(files) == 0:
