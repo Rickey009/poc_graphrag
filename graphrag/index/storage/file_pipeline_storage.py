@@ -211,13 +211,14 @@ class FilePipelineStorage(PipelineStorage):
 #        items = conn.listPath(share_directory, file_path, pattern = '*.docx|*.pdf|*.txt')
         _, ext = os.path.splitext(key)
         ext = ext[1:].lower()
+        print(key)
+        print(ext)
         with io.BytesIO() as file:
             conn.retrieveFile('anthra', f'{file_path}/{key}', file)
             file.seek(0)
             if ext in func_dict:
                 func = func_dict[ext]
                 response = func(file)
-                print(response)
         conn.close()
         #response = requests.post("http://10.2.230.41:8000/filestring4graph", json = {"directoryname": "393", "filename" : key}).json()
         return response
