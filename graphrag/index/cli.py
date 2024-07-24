@@ -267,10 +267,10 @@ def _read_config_parameters(root: str, config: str | None, reporter: ProgressRep
     settings_yaml = (
         Path(config)
         if config and Path(config).suffix in [".yaml", ".yml"]
-        else "settings.yaml"
+        else _cd / "settings.yaml"
     )
     if not settings_yaml.exists():
-        settings_yaml = _cd / "settings.yaml"
+        settings_yaml = _root / "settings.yml"
     settings_json = (
         Path(config)
         if config and Path(config).suffix == ".json"
