@@ -4,10 +4,9 @@
 """The Indexing Engine package root."""
 
 import argparse
-
 from .cli import index_cli
 
-if __name__ == "__main__":
+def main(args=None):
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--config",
@@ -29,7 +28,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "--root",
         help="If no configuration is defined, the root directory to use for input data and output data. Default value: the current directory",
-        # Only required if config is not defined
         required=False,
         default=".",
         type=str,
@@ -37,7 +35,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "--resume",
         help="Resume a given data run leveraging Parquet output files.",
-        # Only required if config is not defined
         required=False,
         default=None,
         type=str,
@@ -68,7 +65,7 @@ if __name__ == "__main__":
         help="Overlay default configuration values on a provided configuration file (--config).",
         action="store_true",
     )
-    args = parser.parse_args()
+    args = parser.parse_args(args)
 
     if args.overlay_defaults and not args.config:
         parser.error("--overlay-defaults requires --config")
@@ -87,3 +84,6 @@ if __name__ == "__main__":
         overlay_defaults=args.overlay_defaults or False,
         cli=True,
     )
+
+if __name__ == "__main__":
+    main()
