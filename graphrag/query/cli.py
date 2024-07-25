@@ -155,7 +155,7 @@ def run_local_search(
     reporter.success(f"Local Search Response: {result.response}")
     return result.response
 
-def get_global_search_prompt(
+async def get_global_search_prompt(
     data_dir: str | None,
     root_dir: str | None,
     community_level: int,
@@ -187,7 +187,7 @@ def get_global_search_prompt(
         response_type=response_type,
     )
 
-    result = search_engine.get_prompt(query=query)
+    result = await search_engine.get_prompt(query=query)
     return result
 
 
