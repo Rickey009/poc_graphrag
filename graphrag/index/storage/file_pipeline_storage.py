@@ -212,7 +212,7 @@ class FilePipelineStorage(PipelineStorage):
         ext = ext[1:].lower()
 
         with io.BytesIO() as file:
-            conn.retrieveFile('anthra', f'{file_path}/{key}', file)
+            conn.retrieveFile(share_directory, f'{file_path}/{key}', file)
             file.seek(0)
             if ext in func_dict:
                 func = func_dict[ext]
