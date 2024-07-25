@@ -199,14 +199,14 @@ class GlobalSearch(BaseSearch):
 
         return reduce_response
 
-    def get_prompt(
+    async def get_prompt(
         self,
         query: str,
         conversation_history: ConversationHistory | None = None,
         **kwargs: Any,
     ) -> str:
         """Perform a global search synchronously."""
-        return asyncio.run(self.aget_prompt(query, conversation_history))
+        return await self.aget_prompt(query, conversation_history)
 
     async def _map_response_single_batch(
         self,
