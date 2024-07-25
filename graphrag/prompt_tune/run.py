@@ -25,7 +25,7 @@ class DocSelectionType(Enum):
         return self.value
 
 
-def run_fine_tune(args=None):
+async def run_fine_tune(args=None):
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -137,24 +137,19 @@ def run_fine_tune(args=None):
     )
     
     parsed_args = parser.parse_args(args)
-
-    loop = asyncio.get_event_loop()
-
-    loop.run_until_complete(
-        fine_tune(
-            parsed_args.root,
-            parsed_args.domain,
-            str(parsed_args.method),
-            parsed_args.limit,
-            parsed_args.max_tokens,
-            parsed_args.chunk_size,
-            parsed_args.language,
-            parsed_args.no_entity_types,
-            parsed_args.output,
-            parsed_args.userid,
-            parsed_args.password,
-            parsed_args.sharedirectory,
-            parsed_args.fileserver,
-            parsed_args.filepath
-        )
+    await fine_tune(
+        parsed_args.root,
+        parsed_args.domain,
+        str(parsed_args.method),
+        parsed_args.limit,
+        parsed_args.max_tokens,
+        parsed_args.chunk_size,
+        parsed_args.language,
+        parsed_args.no_entity_types,
+        parsed_args.output,
+        parsed_args.userid,
+        parsed_args.password,
+        parsed_args.sharedirectory,
+        parsed_args.fileserver,
+        parsed_args.filepath
     )
